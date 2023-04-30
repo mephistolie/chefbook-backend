@@ -1,0 +1,15 @@
+[submodule "secrets"]
+	path = secrets
+	url = https://github.com/mephistolie/chefbook-backend-secrets.git
+[submodule "common-lib"]
+	path = common-lib
+	url = https://github.com/mephistolie/chefbook-backend-common.git
+[submodule "api-gateway"]
+	path = api-gateway
+	url = https://github.com/mephistolie/chefbook-backend-api-gateway.git
+[submodule "servcies/auth"]
+	path = servcies/auth
+	url = https://github.com/mephistolie/chefbook-backend-auth.git
+[submodule "servcies/template"]
+	path = servcies/template
+	url = https://github.com/mephistolie/chefbook-backend-service-template.git
