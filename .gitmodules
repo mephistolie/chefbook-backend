@@ -13,3 +13,6 @@
 [submodule "servcies/template"]
 	path = servcies/template
 	url = https://github.com/mephistolie/chefbook-backend-service-template.git
+[submodule "services/shopping-list"]
+	path = services/shopping-list
+	url = https://github.com/mephistolie/chefbook-backend-shopping-list.git
