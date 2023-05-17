@@ -10,3 +10,9 @@
 [submodule "services/shopping-list"]
 	path = services/shopping-list
 	url = https://github.com/mephistolie/chefbook-backend-shopping-list.git
+[submodule "services/auth"]
+	path = services/auth
+	url = https://github.com/mephistolie/chefbook-backend-auth.git
+[submodule "services/template"]
+	path = services/template
+	url = https://github.com/mephistolie/chefbook-backend-service-template.git
