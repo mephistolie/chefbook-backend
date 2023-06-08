@@ -5,7 +5,10 @@
     <mapping directory="$PROJECT_DIR$/api-gateway" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/common-lib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/secrets" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/servcies/auth" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/servcies/template" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/services/auth" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/services/profile" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/services/shopping-list" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/services/template" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/services/user" vcs="Git" />
   </component>
 </project>
