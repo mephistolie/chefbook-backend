@@ -22,3 +22,6 @@
 [submodule "services/profile"]
 	path = services/profile
 	url = https://github.com/mephistolie/chefbook-backend-profile.git
+[submodule "services/category"]
+	path = services/category
+	url = https://github.com/mephistolie/chefbook-backend-category.git
