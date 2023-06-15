@@ -25,3 +25,6 @@
 [submodule "services/category"]
 	path = services/category
 	url = https://github.com/mephistolie/chefbook-backend-category.git
+[submodule "services/tag"]
+	path = services/tag
+	url = https://github.com/mephistolie/chefbook-backend-tag.git
