@@ -28,3 +28,6 @@
 [submodule "services/tag"]
 	path = services/tag
 	url = https://github.com/mephistolie/chefbook-backend-tag.git
+[submodule "services/recipe"]
+	path = services/recipe
+	url = https://github.com/mephistolie/chefbook-backend-recipe.git
