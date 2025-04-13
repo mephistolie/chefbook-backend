@@ -31,3 +31,6 @@
 [submodule "services/encryption"]
 	path = services/encryption
 	url = https://github.com/mephistolie/chefbook-backend-encryption.git
+[submodule "services/broccoins"]
+	path = services/broccoins
+	url = https://github.com/mephistolie/chefbook-backend-broccoins.git
