@@ -252,6 +252,335 @@ Extra integrations:
 - `auth`, `user`, `recipe`, `encryption`, `shopping-list` include AMQP integration paths
 - all main services expose gRPC and gRPC health checks
 
+## Database Schema
+
+Each service owns its own PostgreSQL schema. Foreign keys are local to a service database only; IDs that point to another service, such as `owner_id`, `user_id`, or `recipe_id`, are logical cross-service references and are not enforced by PostgreSQL.
+
+### Auth Database
+
+Owns credentials, sessions, OAuth bindings, Firebase bindings, activation codes, password reset codes, profile deletion requests, and outgoing events.
+
+```mermaid
+erDiagram
+    AUTH_USERS {
+        uuid user_id PK
+        varchar email UK
+        varchar nickname UK
+        varchar password
+        role role
+        boolean activated
+        timestamptz deletion_timestamp
+    }
+
+    ACTIVATION_CODES {
+        uuid user_id FK,UK
+        varchar activation_code
+    }
+
+    SESSIONS {
+        serial session_id PK
+        uuid user_id FK
+        varchar refresh_token UK
+        inet ip
+        text user_agent
+        timestamptz last_access
+        timestamptz expires_at
+    }
+
+    PASSWORD_RESETS {
+        uuid user_id FK
+        varchar reset_code UK
+        boolean used
+        timestamptz expires_at
+    }
+
+    OAUTH {
+        uuid user_id FK,UK
+        text google_id UK
+        bigint vk_id UK
+    }
+
+    FIREBASE {
+        uuid user_id FK,UK
+        text firebase_id UK
+    }
+
+    DELETE_PROFILE_REQUESTS {
+        uuid user_id FK,UK
+        boolean with_shared_data
+        timestamptz deletion_timestamp
+    }
+
+    AUTH_OUTBOX {
+        uuid message_id PK
+        varchar exchange
+        varchar type
+        jsonb body
+    }
+
+    AUTH_USERS ||--o| ACTIVATION_CODES : owns
+    AUTH_USERS ||--o{ SESSIONS : owns
+    AUTH_USERS ||--o{ PASSWORD_RESETS : owns
+    AUTH_USERS ||--o| OAUTH : owns
+    AUTH_USERS ||--o| FIREBASE : owns
+    AUTH_USERS ||--o| DELETE_PROFILE_REQUESTS : owns
+```
+
+Important constraints:
+- `users.email` and `users.nickname` are unique.
+- `activation_codes`, `oauth`, `firebase`, and `delete_profile_requests` are one-to-one with `users`.
+- `password_resets.reset_code` and `sessions.refresh_token` are globally unique.
+
+### User Database
+
+Owns public profile fields and avatar upload lifecycle. Auth identity is linked by the same `user_id`, but there is no database FK to the auth service.
+
+```mermaid
+erDiagram
+    USER_USERS {
+        uuid user_id PK
+        varchar first_name
+        varchar last_name
+        varchar description
+        uuid avatar_id
+    }
+
+    AVATAR_UPLOADS {
+        uuid avatar_id PK
+        uuid user_id FK,UK
+    }
+
+    USER_INBOX {
+        uuid message_id PK
+        timestamptz timestamp
+    }
+
+    USER_USERS ||--o| AVATAR_UPLOADS : has_pending_upload
+```
+
+### Tag Database
+
+Owns localized tag groups and tags used by recipe search and recipe metadata.
+
+```mermaid
+erDiagram
+    TAG_GROUPS {
+        varchar group_id PK
+        varchar name_en
+        varchar name_ru
+    }
+
+    TAGS {
+        varchar tag_id PK
+        varchar name_en
+        varchar name_ru
+        varchar emoji
+        varchar group_id FK
+    }
+
+    TAG_GROUPS ||--o{ TAGS : contains
+```
+
+### Recipe Database
+
+Owns recipes, recipe read state, favourites, scores, translations, pictures, collections, collection membership, collection sharing keys, and MQ inbox/outbox.
+
+```mermaid
+erDiagram
+    RECIPES {
+        uuid recipe_id PK
+        varchar name
+        uuid owner_id
+        visibility visibility
+        boolean encrypted
+        varchar language
+        text_array translations
+        jsonb ingredients
+        jsonb cooking
+        jsonb pictures
+        decimal rating
+        int votes
+        text_array tags
+        int version
+    }
+
+    TRANSLATIONS {
+        uuid recipe_id FK
+        varchar language
+        uuid author_id
+        varchar name
+        jsonb ingredients
+        jsonb cooking
+    }
+
+    RECIPE_PICTURES_UPLOADS {
+        uuid recipe_id FK,UK
+        jsonb pictures
+    }
+
+    RECIPE_BOOK {
+        uuid recipe_id FK
+        uuid user_id
+    }
+
+    FAVOURITES {
+        uuid recipe_id FK
+        uuid user_id
+    }
+
+    SCORES {
+        uuid recipe_id FK
+        uuid user_id
+        smallint score
+    }
+
+    COLLECTIONS {
+        uuid collection_id PK
+        varchar name
+        visibility visibility
+    }
+
+    COLLECTIONS_KEYS {
+        uuid collection_id FK,UK
+        uuid key
+        timestamptz expires_at
+    }
+
+    COLLECTIONS_CONTRIBUTORS {
+        uuid collection_id FK
+        uuid contributor_id
+        contributor_role role
+    }
+
+    COLLECTIONS_USERS {
+        uuid collection_id FK
+        uuid user_id
+    }
+
+    RECIPES_COLLECTIONS {
+        uuid recipe_id FK
+        uuid collection_id FK
+        timestamptz binding_timestamp
+    }
+
+    RECIPE_INBOX {
+        uuid message_id PK
+        timestamptz timestamp
+    }
+
+    RECIPE_OUTBOX {
+        uuid message_id PK
+        varchar exchange
+        varchar type
+        jsonb body
+    }
+
+    RECIPES ||--o{ TRANSLATIONS : has
+    RECIPES ||--o| RECIPE_PICTURES_UPLOADS : has_upload_state
+    RECIPES ||--o{ RECIPE_BOOK : saved_by
+    RECIPES ||--o{ FAVOURITES : favourited_by
+    RECIPES ||--o{ SCORES : rated_by
+    RECIPES ||--o{ RECIPES_COLLECTIONS : assigned_to
+    COLLECTIONS ||--o| COLLECTIONS_KEYS : has_invite_key
+    COLLECTIONS ||--o{ COLLECTIONS_CONTRIBUTORS : editable_by
+    COLLECTIONS ||--o{ COLLECTIONS_USERS : saved_by
+    COLLECTIONS ||--o{ RECIPES_COLLECTIONS : contains
+```
+
+Important constraints:
+- `recipes.encrypted=true` cannot be combined with `visibility='public'`.
+- `translations` are unique by `(recipe_id, language, author_id)`.
+- `recipe_book`, `favourites`, `scores`, `collections_contributors`, `collections_users`, and `recipes_collections` are unique by their pair keys.
+- `recipes.translations` and `recipes.tags` have GIN indexes.
+- `owner_id`, `user_id`, `author_id`, and `contributor_id` reference users logically across services.
+
+### Encryption Database
+
+Owns encrypted vault keys, recipe access keys, key request status, vault deletion codes, and MQ inbox/outbox.
+
+```mermaid
+erDiagram
+    VAULT_KEYS {
+        uuid user_id PK
+        text public_key
+        text private_key
+        text salt
+    }
+
+    RECIPE_KEYS {
+        uuid recipe_id
+        uuid user_id FK
+        text key
+        recipe_key_request_status status
+    }
+
+    VAULT_DELETIONS {
+        uuid user_id FK,UK
+        varchar delete_code
+    }
+
+    ENCRYPTION_INBOX {
+        uuid message_id PK
+        timestamptz timestamp
+    }
+
+    ENCRYPTION_OUTBOX {
+        uuid message_id PK
+        varchar exchange
+        varchar type
+        jsonb body
+    }
+
+    VAULT_KEYS ||--o{ RECIPE_KEYS : owns_or_requests
+    VAULT_KEYS ||--o| VAULT_DELETIONS : pending_deletion
+```
+
+Important constraints:
+- `recipe_keys` are unique by `(recipe_id, user_id)`.
+- `recipe_keys.recipe_id` is a logical reference to the recipe service.
+- `recipe_keys.user_id` is a local FK to `vault_keys`, not to auth/user.
+
+### Shopping List Database
+
+Owns personal/shared shopping lists, per-user list names, invite keys, and MQ inbox.
+
+```mermaid
+erDiagram
+    SHOPPING_LISTS {
+        uuid shopping_list_id PK
+        shopping_list_type type
+        uuid owner_id
+        jsonb purchases
+        int version
+    }
+
+    SHOPPING_LISTS_USERS {
+        uuid shopping_list_id FK
+        uuid user_id
+        varchar name
+    }
+
+    SHOPPING_KEYS {
+        uuid shopping_list_id FK,UK
+        uuid key
+        timestamptz expires_at
+    }
+
+    SHOPPING_INBOX {
+        uuid message_id PK
+        timestamptz timestamp
+    }
+
+    SHOPPING_LISTS ||--o{ SHOPPING_LISTS_USERS : visible_to
+    SHOPPING_LISTS ||--o| SHOPPING_KEYS : has_invite_key
+```
+
+Important constraints:
+- `shopping_lists_users` is unique by `(shopping_list_id, user_id)`.
+- `shopping_lists_users.name` is the user's display name for that list, not the profile/user name.
+- `shopping_lists.version` is used for optimistic updates.
+- `owner_id` and `shopping_lists_users.user_id` are logical cross-service user references.
+
 ## Internal Service Template
 
 Most services follow this shape:
