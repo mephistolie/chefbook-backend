@@ -34,3 +34,6 @@
 [submodule "services/broccoins"]
 	path = services/broccoins
 	url = https://github.com/mephistolie/chefbook-backend-broccoins.git
+[submodule "services/subscription"]
+	path = services/subscription
+	url = https://github.com/mephistolie/chefbook-backend-subscription.git
