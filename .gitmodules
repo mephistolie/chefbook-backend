@@ -1,8 +1,8 @@
 [submodule "secrets"]
 	path = secrets
 	url = https://github.com/mephistolie/chefbook-backend-secrets.git
-[submodule "common-lib"]
-	path = common-lib
+[submodule "common"]
+	path = common
 	url = https://github.com/mephistolie/chefbook-backend-common.git
 [submodule "api-gateway"]
 	path = api-gateway

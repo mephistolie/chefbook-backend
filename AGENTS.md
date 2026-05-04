@@ -7,13 +7,13 @@ This directory contains the ChefBook backend platform.
 - Go microservice architecture
 - `api-gateway` is the external entrypoint for client traffic
 - `services/` contains domain microservices
-- `common-lib/` contains reusable infrastructure libraries
+- `common/` contains reusable infrastructure libraries
 - each service owns its own storage and deployment configuration
 
 ## Backend Rules
 
-- Keep business logic inside the owning service; do not move domain behavior into `common-lib`.
-- Treat `common-lib` as reusable infrastructure or utility code, not a dumping ground for service-specific logic.
+- Keep business logic inside the owning service; do not move domain behavior into `common`.
+- Treat `common` as reusable infrastructure or utility code, not a dumping ground for service-specific logic.
 - Preserve service isolation: avoid coupling services through direct database assumptions.
 - Prefer explicit contracts through API modules, gRPC, or MQ integration points already present in the codebase.
 - Keep deployment and migration changes close to the affected service.
@@ -22,7 +22,7 @@ This directory contains the ChefBook backend platform.
 
 - `api-gateway/` for client-facing routing, REST/gRPC bridging, auth enforcement, and edge concerns
 - `services/<name>/` for domain logic of a specific microservice
-- `common-lib/` for shared backend primitives reused by multiple services
+- `common/` for shared backend primitives reused by multiple services
 - `secrets/` for secret-management artifacts; treat as sensitive and do not modify casually
 
 ## Validation

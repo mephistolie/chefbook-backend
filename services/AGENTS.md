@@ -11,7 +11,7 @@ This directory contains ChefBook backend microservices.
 ## Before Editing
 
 - Read the local `AGENTS.md` in the target service directory.
-- Check whether the task affects only that service or also the API gateway, another service, or `common-lib`.
+- Check whether the task affects only that service or also the API gateway, another service, or `common`.
 
 ## Cross-Service Changes
 

@@ -7,7 +7,7 @@ Use this README as the top-level architecture map. Service-specific ownership, c
 ## Repository Shape
 
 - `api-gateway` - public HTTP entrypoint and REST-to-gRPC bridge
-- `common-lib` - reusable backend infrastructure packages
+- `common` - reusable backend infrastructure packages
 - `services/auth` - accounts, credentials, sessions, OAuth, JWT issuing
 - `services/user` - public user profile fields and avatar upload lifecycle
 - `services/profile` - aggregated profile read models
@@ -108,7 +108,7 @@ For implementation work:
 - [Subscription Service](services/subscription/README.md)
 - [Broccoins Service](services/broccoins/README.md)
 - [Service Template](services/template/README.md)
-- [Common Library](common-lib/README.md)
+- [Common Library](common/README.md)
 - [Secrets](secrets/README.md)
 
 ## Agent Navigation
