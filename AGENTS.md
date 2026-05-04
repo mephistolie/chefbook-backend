@@ -35,4 +35,5 @@ This directory contains the ChefBook backend platform.
 
 - Read `services/*/AGENTS.md` before editing a specific microservice.
 - The nearest `AGENTS.md` takes precedence over this backend-wide file.
-- Use `API_ARCHITECTURE.md` as the first-stop map for gateway, service ownership, and inter-service dependencies.
+- Use `README.md` as the first-stop map for gateway, service ownership, and inter-service dependencies.
+- Read the owning service `README.md` for concrete architecture before editing that service.
