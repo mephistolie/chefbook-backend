@@ -114,3 +114,10 @@ For implementation work:
 ## Agent Navigation
 
 For agent work, use this README as the service dependency map, then open the nearest service README and `AGENTS.md` before editing files. Keep concrete service architecture in service-local README files so submodule context remains useful on its own.
+
+## Logging Check
+
+Run `./scripts/check_structured_logging.sh` after changing backend logging. It
+rejects legacy and `Auto*` calls, legacy declarations in `common/log`, and
+service code that constructs `log.Event` outside its own `internal/logging`
+package.

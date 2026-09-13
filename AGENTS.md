@@ -30,6 +30,9 @@ This directory contains the ChefBook backend platform.
 - Run Go commands from the smallest affected module.
 - Prefer service-local build or test commands before broader backend-wide checks.
 - When changing contracts between services, verify both the provider and the consumer.
+- After logging changes, run `./scripts/check_structured_logging.sh`.
+- Keep service event construction in `internal/logging`; do not add legacy,
+  `Auto*`, or call-site-derived logging helpers.
 
 ## Local Overrides
 
