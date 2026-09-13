@@ -19,7 +19,7 @@ authentication, and `displayName` in user/profile data. Service and API tags use
 
 | Component | Candidate |
 | --- | --- |
-| API gateway | `v0.14.0-rc.1` |
+| API gateway | `v0.14.0-rc.2` |
 | Auth | `v1.9.0-rc.3` |
 | User | `v1.5.0-rc.2` |
 | Profile | `v1.4.0-rc.1` |
@@ -34,6 +34,9 @@ other database-backed services' `rc.2` use `common/migrate/sql v0.8.1`, which ma
 the legacy `pgx` driver name to the registered `pgx5` adapter. API modules remain
 at their initial `api/...-rc.1` tags. The service template is a
 scaffold, not a deployed service, and has no runtime release in this batch.
+
+Gateway `rc.2` uses the configured backend domain in Swagger so the dev UI sends
+requests to dev rather than the production host.
 
 Go modules pin published common-library and API versions so individual services
 can build with `GOWORK=off`. Repository commits and tags describe source releases;
