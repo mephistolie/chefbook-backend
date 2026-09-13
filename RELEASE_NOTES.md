@@ -20,16 +20,19 @@ authentication, and `displayName` in user/profile data. Service and API tags use
 | Component | Candidate |
 | --- | --- |
 | API gateway | `v0.14.0-rc.1` |
-| Auth | `v1.9.0-rc.1` |
-| User | `v1.5.0-rc.1` |
+| Auth | `v1.9.0-rc.3` |
+| User | `v1.5.0-rc.2` |
 | Profile | `v1.4.0-rc.1` |
-| Tag | `v1.2.0-rc.1` |
-| Recipe | `v1.8.0-rc.1` |
-| Encryption | `v1.2.0-rc.1` |
-| Shopping list | `v2.5.0-rc.1` |
-| Subscription | `v1.1.0-rc.1` |
+| Tag | `v1.2.0-rc.2` |
+| Recipe | `v1.8.0-rc.2` |
+| Encryption | `v1.2.0-rc.2` |
+| Shopping list | `v2.5.0-rc.2` |
+| Subscription | `v1.1.0-rc.2` |
 
-Each service API module has a matching `api/` tag. The service template is a
+Auth `rc.2` fixes registration when Firebase is disabled. Auth `rc.3` and the
+other database-backed services' `rc.2` use `common/migrate/sql v0.8.1`, which maps
+the legacy `pgx` driver name to the registered `pgx5` adapter. API modules remain
+at their initial `api/...-rc.1` tags. The service template is a
 scaffold, not a deployed service, and has no runtime release in this batch.
 
 Go modules pin published common-library and API versions so individual services
