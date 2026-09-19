@@ -8,6 +8,7 @@ cd "$repository_root"
 service_modules=(
   api-gateway
   services/auth
+  services/mail
   services/encryption
   services/profile
   services/recipe
